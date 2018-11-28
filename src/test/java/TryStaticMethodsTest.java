@@ -2,8 +2,11 @@ import io.vavr.control.Try;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static java.util.stream.Collectors.joining;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertNull;
@@ -39,7 +42,7 @@ public class TryStaticMethodsTest {
         Try<RuntimeException> exceptionTry = Try.of(() -> {
             throw exception;
         });
-        
+
         assertTrue(exceptionTry.isFailure());
         assertThat(exceptionTry.getCause(), is(exception));
     }
@@ -62,13 +65,13 @@ public class TryStaticMethodsTest {
         assertTrue(tryWithoutException.isSuccess());
         assertThat(tryWithoutException.get(), is(1));
     }
-    
+
     @Test
     public void run_success() {
         AtomicBoolean invoked = new AtomicBoolean();
 
         Try<Void> run = Try.run(() -> invoked.set(true));
-        
+
         assertTrue(run.isSuccess());
         assertNull(run.get());
         assertTrue(invoked.get());
@@ -83,5 +86,52 @@ public class TryStaticMethodsTest {
 
         assertTrue(runFailure.isFailure());
         assertThat(runFailure.getCause(), is(exception));
+    }
+
+    @Test
+    public void java_try_with_resource_success() throws IOException {
+        String fileName = "src/test/resources/lines.txt";
+        
+        String fileLines;
+        try (var stream = Files.lines(Paths.get(fileName))) {
+
+            fileLines = stream.collect(joining(","));
+        }
+        
+        assertThat(fileLines, is("1,2,3"));
+    }
+
+    @Test(expected = IOException.class)
+    public void java_try_with_resource_failure() throws IOException {
+        String fileName = "NonExistingFile.txt";
+        
+        String fileLines;
+        try (var stream = Files.lines(Paths.get(fileName))) {
+
+            fileLines = stream.collect(joining(","));
+        }
+
+        assertThat(fileLines, is("1,2,3"));
+    }
+
+    @Test
+    public void vavr_try_with_resources_success() {
+        String fileName = "src/test/resources/lines.txt";
+
+        Try<String> fileLines = Try.withResources(() -> Files.lines(Paths.get(fileName)))
+                .of(stream -> stream.collect(joining(",")));
+
+        assertTrue(fileLines.isSuccess());
+        assertThat(fileLines.get(), is("1,2,3"));
+    }
+
+    @Test
+    public void vavr_try_with_resources_failure() {
+        String fileName = "NonExistingFile.txt";
+
+        Try<String> fileLines = Try.withResources(() -> Files.lines(Paths.get(fileName)))
+                .of(stream -> stream.collect(joining(",")));
+
+        assertTrue(fileLines.isFailure());
     }
 }
