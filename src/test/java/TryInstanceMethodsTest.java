@@ -164,4 +164,9 @@ public class TryInstanceMethodsTest {
 
         assertThat(recovered, is(Try.of(() -> -1)));
     }
+    
+    @Test
+    public void filterTry_predicate_function_success_passes() {
+        Try.of(() -> 1).filterTry(x -> x > 0, value -> new RuntimeException());
+    }
 }
