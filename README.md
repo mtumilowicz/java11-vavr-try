@@ -66,3 +66,38 @@ otherwise `Failure(throwable)` if an exception occurs
 * `Try<Void>	runRunnable(Runnable runnable)`
 * `Try<Seq<T>>	sequence(Iterable<? extends Try<? extends T>> values)`
 * `<T1 extends AutoCloseable> Try.WithResources1<T1> withResources(CheckedFunction0<? extends T1> t1Supplier)`
+    * java `try-with-resources`
+        ```
+        String fileName = "NonExistingFile.txt";
+        
+        String fileLines;
+        try (var stream = Files.lines(Paths.get(fileName))) {
+        
+            fileLines = stream.collect(joining(","));
+        }
+        ```
+    * vavr `try-with-resources`
+        ```
+        String fileName = "src/test/resources/lines.txt";
+        Try<String> fileLines = Try.withResources(() -> Files.lines(Paths.get(fileName)))
+                        .of(stream -> stream.collect(joining(",")));
+        ```
+        * success
+            ```
+            String fileName = "src/test/resources/lines.txt";
+            
+            Try<String> fileLines = Try.withResources(() -> Files.lines(Paths.get(fileName)))
+                    .of(stream -> stream.collect(joining(",")));
+            
+            assertTrue(fileLines.isSuccess());
+            assertThat(fileLines.get(), is("1,2,3"));
+            ```
+        * failure
+            ```
+            String fileName = "NonExistingFile.txt";
+            
+            Try<String> fileLines = Try.withResources(() -> Files.lines(Paths.get(fileName)))
+                    .of(stream -> stream.collect(joining(",")));
+            
+            assertTrue(fileLines.isFailure());
+            ```
