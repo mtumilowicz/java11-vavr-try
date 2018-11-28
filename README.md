@@ -12,10 +12,12 @@ computed value. Instances of `Try`, are either an instance of
 `Success` or `Failure`.
 
 # project description
-We provide description and tests of `Try` methods.
+We provide description and tests for `Try`'s methods.
 
-Please refer my other github project: https://github.com/mtumilowicz/java11-vavr-option
-because we won't provide examples to the Optional's similar methods.
+Please refer my other github project: 
+https://github.com/mtumilowicz/java11-vavr-option
+because we won't provide examples to the similar methods 
+described in the project about `Option`.
 
 ## static methods
 * `Try<T>	failure(Throwable exception)` - 
@@ -63,8 +65,11 @@ without checked exceptions
 * `Try<Void>	run(CheckedRunnable runnable)` - 
 returns `Success(null)` if no exception occurs, 
 otherwise `Failure(throwable)` if an exception occurs
-* `Try<Void>	runRunnable(Runnable runnable)`
-* `Try<Seq<T>>	sequence(Iterable<? extends Try<? extends T>> values)`
+* `Try<Void>	runRunnable(Runnable runnable)` - same as `run`
+but without checked exceptions
+* `Try<Seq<T>>	sequence(Iterable<? extends Try<? extends T>> values)` - 
+Reduces many `Trys` into a single `Try` by transforming an 
+`Iterable<Try<? extends T>>` into a `Try<Seq<T>>`.
 * `<T1 extends AutoCloseable> Try.WithResources1<T1> withResources(CheckedFunction0<? extends T1> t1Supplier)`
     * java `try-with-resources`
         ```
