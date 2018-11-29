@@ -220,7 +220,7 @@ true if this is a `Failure`, false if this is a `Success`.
 * `Try<T>	mapFailure(API.Match.Case<? extends Throwable,? extends Throwable>... cases)` - 
 Maps the cause to a new exception if this is a `Failure` 
 or returns this instance if this is a `Success`.
-`Try<U>	mapTry(CheckedFunction1<? super T,? extends U> mapper)` - 
+* `Try<U>	mapTry(CheckedFunction1<? super T,? extends U> mapper)` - 
 Runs the given checked function if this is a `Success`, 
 passing the result of the current expression to it.
 * `Try<T>	onFailure(Consumer<? super Throwable> action)` - 
