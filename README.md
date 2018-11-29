@@ -128,11 +128,11 @@ of the operation is.
     ```
     ```
     Try<Integer> vavrTry = Try.of(() -> 1).andFinally(() -> {
-        throw new RuntimeException();
+        throw new IllegalStateException();
     });
-    
+
     assertTrue(vavrTry.isFailure());
-    assertTrue(vavrTry.getCause() instanceof RuntimeException)
+    assertTrue(vavrTry.getCause() instanceof IllegalStateException);
     ```
 * `Try<T>	andFinallyTry(CheckedRunnable runnable)`
 * `Try<T>	andThen(Consumer<? super T> consumer)`
@@ -144,9 +144,9 @@ of the operation is.
     Try<Integer> vavrTry = Try.<Integer>of(() -> {
         throw new IllegalArgumentException();
     }).andThen(() -> {
-                throw new RuntimeException();
+                throw new IllegalStateException();
             });
-    
+
     assertTrue(vavrTry.isFailure());
     assertTrue(vavrTry.getCause() instanceof IllegalArgumentException);
     ```
