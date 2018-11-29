@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/mtumilowicz/java11-vavr-try.svg?branch=master)](https://travis-ci.com/mtumilowicz/java11-vavr-try)
+
 # java11-vavr-try
 
 _Reference_: https://www.baeldung.com/vavr-try  
