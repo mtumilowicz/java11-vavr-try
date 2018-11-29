@@ -234,12 +234,12 @@ Consumes the value if this is a `Success`.
 Applies the action to the value of a `Success` or does 
 nothing in the case of a `Failure`.
 * `<X extends Throwable> Try<T>	recover(Class<X> exception,
-       Function<? super X,? extends T> f)` - 
-* returns `this`, if `this` is a `Success`
-* returns`this`, if `this` is a `Failure` 
-and the cause is not assignable.
-* return new `Success` if this is a `Failure` and
-cause is assignable
+       Function<? super X,? extends T> f)`
+    * returns `this`, if `this` is a `Success`
+    * returns`this`, if `this` is a `Failure` 
+    and the cause is not assignable.
+    * return new `Success` if this is a `Failure` and
+    cause is assignable
     ```
     Try<Integer> recovered = Try.<Integer>of(() -> {
         throw new RuntimeException();
