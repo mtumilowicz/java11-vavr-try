@@ -166,7 +166,48 @@ public class TryInstanceMethodsTest {
     }
     
     @Test
-    public void filterTry_predicate_function_success_passes() {
-        Try.of(() -> 1).filterTry(x -> x > 0, value -> new RuntimeException());
+    public void filterTry_success_predicate_passes_function() {
+        Try<Integer> vavrTry = Try.of(() -> 1).filterTry(x -> x > 0, value -> new RuntimeException());
+        
+        assertThat(vavrTry, is(Try.of(() -> 1)));
+    }
+
+    @Test
+    public void filterTry_success_predicate_notPasses_function() {
+        var runtimeException = new RuntimeException();
+        
+        Try<Integer> vavrTry = Try.of(() -> 1).filterTry(x -> x > 10, value -> runtimeException);
+
+        assertThat(vavrTry.getCause(), is(runtimeException));
+    }
+
+    @Test
+    public void filterTry_failure_predicate_function() {
+        var illegalArgumentException = new IllegalArgumentException();
+
+        Try<Integer> vavrTry = Try.<Integer>of(() -> {throw illegalArgumentException;})
+                .filterTry(x -> x > 0, value -> new RuntimeException());
+
+        assertThat(vavrTry.getCause(), is(illegalArgumentException));
+    }
+
+    @Test
+    public void filterTry_success_predicate_exception_function() {
+        var nullPointerException = new NullPointerException();
+
+        Try<Integer> vavrTry = Try.of(() -> 1)
+                .filterTry(x -> {throw nullPointerException;}, value -> new RuntimeException());
+
+        assertThat(vavrTry.getCause(), is(nullPointerException));
+    }
+
+    @Test
+    public void filterTry_failure_predicate_exception_function() {
+        var illegalArgumentException = new IllegalArgumentException();
+
+        Try<Integer> vavrTry = Try.<Integer>of(() -> {throw illegalArgumentException;})
+                .filterTry(x -> {throw new NullPointerException();}, value -> new RuntimeException());
+
+        assertThat(vavrTry.getCause(), is(illegalArgumentException));
     }
 }
