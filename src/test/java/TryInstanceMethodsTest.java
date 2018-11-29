@@ -37,11 +37,11 @@ public class TryInstanceMethodsTest {
     @Test
     public void andFinally_exception() {
         Try<Integer> vavrTry = Try.of(() -> 1).andFinally(() -> {
-            throw new RuntimeException();
+            throw new IllegalStateException();
         });
 
         assertTrue(vavrTry.isFailure());
-        assertTrue(vavrTry.getCause() instanceof RuntimeException);
+        assertTrue(vavrTry.getCause() instanceof IllegalStateException);
     }
 
     @Test
@@ -67,11 +67,11 @@ public class TryInstanceMethodsTest {
     @Test
     public void andThen_success_exception() {
         Try<Integer> vavrTry = Try.of(() -> 1).andThen(() -> {
-            throw new RuntimeException();
+            throw new IllegalStateException();
         });
 
         assertTrue(vavrTry.isFailure());
-        assertTrue(vavrTry.getCause() instanceof RuntimeException);
+        assertTrue(vavrTry.getCause() instanceof IllegalStateException);
     }
 
     @Test
@@ -79,7 +79,7 @@ public class TryInstanceMethodsTest {
         Try<Integer> vavrTry = Try.<Integer>of(() -> {
             throw new IllegalArgumentException();
         }).andThen(() -> {
-                    throw new RuntimeException();
+                    throw new IllegalStateException();
                 });
 
         assertTrue(vavrTry.isFailure());
@@ -161,12 +161,12 @@ public class TryInstanceMethodsTest {
     @Test
     public void recover_class_function_failure_notAssignable() {
         Try<Integer> recovered = Try.<Integer>of(() -> {
-            throw new RuntimeException();
+            throw new IllegalStateException();
         })
                 .recover(IllegalArgumentException.class, exception -> -1);
 
         assertTrue(recovered.isFailure());
-        assertTrue(recovered.getCause() instanceof RuntimeException);
+        assertTrue(recovered.getCause() instanceof IllegalStateException);
     }
 
     @Test
@@ -233,7 +233,7 @@ public class TryInstanceMethodsTest {
         Try<Integer> vavrTry = Try.of(() -> 1)
                 .filterTry(x -> {
                     throw nullPointerException;
-                }, value -> new RuntimeException());
+                }, value -> new IllegalStateException());
 
         assertThat(vavrTry.getCause(), is(nullPointerException));
     }
@@ -250,5 +250,10 @@ public class TryInstanceMethodsTest {
                 }, value -> new RuntimeException());
 
         assertThat(vavrTry.getCause(), is(illegalArgumentException));
+    }
+    
+    @Test(expected = IllegalStateException.class)
+    public void get_failure() {
+        Try.of(() -> {throw new IllegalStateException();}).get();
     }
 }
