@@ -166,6 +166,13 @@ if this is a `Success`.
            the value does not satisfy the `Predicate` or an exception
            occurs testing the predicate. The returned `Failure` wraps 
            a `Throwable` instance provided by the given `errorProvider`.
+           ```
+           var runtimeException = new RuntimeException();
+           
+           Try<Integer> vavrTry = Try.of(() -> 1).filterTry(x -> x > 10, value -> runtimeException);
+           
+           assertThat(vavrTry.getCause(), is(runtimeException));
+           ```
 * `Try<T>	filter(Predicate<? super T> predicate,
       Function<? super T,? extends Throwable> errorProvider)`
 * `Try<T>	filter(Predicate<? super T> predicate)`
@@ -184,12 +191,12 @@ if this is a `Failure`.
 * `Throwable	getCause()` - 
 Gets the cause if this is a `Failure` or throws 
 `UnsupportedOperationException` if this is a `Success`.
-`T	getOrElseGet(Function<? super Throwable,? extends T> other)` 
+* `T	getOrElseGet(Function<? super Throwable,? extends T> other)` 
 `<X extends Throwable>
 T	getOrElseThrow(Function<? super Throwable,X> exceptionProvider) `
 * `int	hashCode()`
 * `boolean	isEmpty()` - 
-true if this is a Failure, returns false if this is a Success.
+true if this is a `Failure`, returns false if this is a `Success`.
 * `boolean	isFailure()`
 * `boolean	isSuccess()`
 * `Try<U>	map(Function<? super T,? extends U> mapper)`
@@ -213,14 +220,28 @@ nothing in the case of a `Failure`.
        Function<? super X,? extends T> f)` - 
 Returns `this`, if `this` is a `Success` or `this` is a 
 `Failure` and the cause is not assignable from `cause.getClass()`.
+    ```
+    Try<Integer> recovered = Try.<Integer>of(() -> {
+        throw new RuntimeException();
+    })
+            .recover(RuntimeException.class, -1);
+    
+    assertThat(recovered, is(Try.of(() -> -1)));
+    ```
 * `<X extends Throwable>
 Try<T>	recover(Class<X> exception,
        T value)`
 * `Try<T>	recover(Function<? super Throwable,? extends T> f)`
 * `<X extends Throwable>
 Try<T>	recoverWith(Class<X> exception,
-           Function<? super X,Try<? extends T>> f)` - 
-Returns this, if this is a Success or this is a Failure and the cause is not assignable from cause.getClass().
+           Function<? super X,Try<? extends T>> f)` - same as `recover` but recover function returns Try
+    ```
+    Try<Integer> recovered = Try.<Integer>of(() -> {
+        throw new RuntimeException();
+    }).recoverWith(exception -> Try.of(() -> -1));
+    
+    assertThat(recovered, is(Try.of(() -> -1)));
+    ```
 * `<X extends Throwable>
 Try<T>	recoverWith(Class<X> exception,
            Try<? extends T> recovered) `
