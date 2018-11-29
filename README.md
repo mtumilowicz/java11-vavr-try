@@ -110,30 +110,68 @@ Reduces many `Trys` into a single `Try` by transforming an
 * `Try<T>	andFinally(Runnable runnable)` - 
 Provides try's finally behavior no matter what the result 
 of the operation is.
+    ```
+    var invoked = new AtomicBoolean();
+    
+    Try.of(() -> 1).andFinally(() -> invoked.set(true));
+    
+    assertTrue(invoked.get());
+    ```
+    ```
+    var invoked = new AtomicBoolean();
+    
+    Try.of(() -> {
+        throw new RuntimeException();
+    }).andFinally(() -> invoked.set(true));
+    
+    assertTrue(invoked.get());
+    ```
+    ```
+    Try<Integer> vavrTry = Try.of(() -> 1).andFinally(() -> {
+        throw new RuntimeException();
+    });
+    
+    assertTrue(vavrTry.isFailure());
+    assertTrue(vavrTry.getCause() instanceof RuntimeException)
+    ```
 * `Try<T>	andFinallyTry(CheckedRunnable runnable)`
-* `Try<T>	andThenTry(CheckedConsumer<? super T> consumer)` - 
-Passes the result to the given consumer if this is a `Success`.
-* `Try<T>	andThen(Consumer<? super T> consumer)`
-* `Try<T>	andThenTry(CheckedRunnable runnable)` - 
-Runs the given runnable if this is a Success, otherwise returns this Failure.
+* `Try<T>	andThen(Consumer<? super T> consumer)` - 
+    * if this is a success - pass the value to consumer
+    * if this is a failure - do nothing
+    * if success and then exception in consumer - 
+    failure with new exception
+    ```
+    Try<Integer> vavrTry = Try.<Integer>of(() -> {
+        throw new IllegalArgumentException();
+    }).andThen(() -> {
+                throw new RuntimeException();
+            });
+    
+    assertTrue(vavrTry.isFailure());
+    assertTrue(vavrTry.getCause() instanceof IllegalArgumentException);
+    ```
+* `Try<T>	andThenTry(CheckedConsumer<? super T> consumer)`
+* `Try<T>	andThenTry(CheckedRunnable runnable)`
 * `Try<T>	andThen(Runnable runnable)`
 * `Try<R>	collect(PartialFunction<? super T,? extends R> partialFunction)`
-* `Try<Throwable>	failed()` - 
-Returns `Success(throwable)` if this is a `Failure(throwable)`, 
-otherwise a `Failure(new NoSuchElementException("Success.failed()"))` 
+* `Try<Throwable>	failed()`
+    * returns `Success(throwable)` if this is a `Failure(throwable)`
+    * returns `Failure(new NoSuchElementException("Success.failed()"))` 
 if this is a `Success`.
-* `Try<T>	filter(Predicate<? super T> predicate)`
+* `Try<T>	filterTry(CheckedPredicate<? super T> predicate,
+           CheckedFunction1<? super T,? extends Throwable> errorProvider)`
+           * returns this if this is a `Failure` 
+           * returns this if is a `Success` and the value satisfies the predicate.
+           * returns a new `Failure`, if this is a `Success` and 
+           the value does not satisfy the `Predicate` or an exception
+           occurs testing the predicate. The returned `Failure` wraps 
+           a `Throwable` instance provided by the given `errorProvider`.
 * `Try<T>	filter(Predicate<? super T> predicate,
       Function<? super T,? extends Throwable> errorProvider)`
+* `Try<T>	filter(Predicate<? super T> predicate)`
 * `Try<T>	filter(Predicate<? super T> predicate,
       Supplier<? extends Throwable> throwableSupplier)`
-* `Try<T>	filterTry(CheckedPredicate<? super T> predicate)` - 
-Returns `this` if `this` is a `Failure` or `this` is a 
-`Success` and the value satisfies the predicate.
-* `Try<T>	filterTry(CheckedPredicate<? super T> predicate,
-         CheckedFunction1<? super T,? extends Throwable> errorProvider)`
-Returns `this` if `this` is a `Failure` or `this` is a `Success` 
-and the value satisfies the predicate.
+* `Try<T>	filterTry(CheckedPredicate<? super T> predicate)` 
 * `Try<T>	filterTry(CheckedPredicate<? super T> predicate,
          Supplier<? extends Throwable> throwableSupplier)`
 * `Try<U>	flatMap(Function<? super T,? extends Try<? extends U>> mapper)`
