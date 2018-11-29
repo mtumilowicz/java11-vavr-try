@@ -135,7 +135,7 @@ of the operation is.
     assertTrue(vavrTry.getCause() instanceof RuntimeException)
     ```
 * `Try<T>	andFinallyTry(CheckedRunnable runnable)`
-* `Try<T>	andThen(Consumer<? super T> consumer)` - 
+* `Try<T>	andThen(Consumer<? super T> consumer)`
     * if this is a success - pass the value to consumer
     * if this is a failure - do nothing
     * if success and then exception in consumer - 
@@ -160,19 +160,19 @@ of the operation is.
 if this is a `Success`.
 * `Try<T>	filterTry(CheckedPredicate<? super T> predicate,
            CheckedFunction1<? super T,? extends Throwable> errorProvider)`
-           * returns this if this is a `Failure` 
-           * returns this if is a `Success` and the value satisfies the predicate.
-           * returns a new `Failure`, if this is a `Success` and 
-           the value does not satisfy the `Predicate` or an exception
-           occurs testing the predicate. The returned `Failure` wraps 
-           a `Throwable` instance provided by the given `errorProvider`.
-           ```
-           var runtimeException = new RuntimeException();
-           
-           Try<Integer> vavrTry = Try.of(() -> 1).filterTry(x -> x > 10, value -> runtimeException);
-           
-           assertThat(vavrTry.getCause(), is(runtimeException));
-           ```
+    * returns this if this is a `Failure` 
+    * returns this if is a `Success` and the value satisfies the predicate.
+    * returns a new `Failure`, if this is a `Success` and 
+    the value does not satisfy the `Predicate` or an exception
+    occurs testing the predicate. The returned `Failure` wraps 
+    a `Throwable` instance provided by the given `errorProvider`.
+    ```
+    var runtimeException = new RuntimeException();
+    
+    Try<Integer> vavrTry = Try.of(() -> 1).filterTry(x -> x > 10, value -> runtimeException);
+    
+    assertThat(vavrTry.getCause(), is(runtimeException));
+    ```
 * `Try<T>	filter(Predicate<? super T> predicate,
       Function<? super T,? extends Throwable> errorProvider)`
 * `Try<T>	filter(Predicate<? super T> predicate)`
