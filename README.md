@@ -118,7 +118,6 @@ Passes the result to the given consumer if this is a `Success`.
 Runs the given runnable if this is a Success, otherwise returns this Failure.
 * `Try<T>	andThen(Runnable runnable)`
 * `Try<R>	collect(PartialFunction<? super T,? extends R> partialFunction)`
-* `boolean	equals(Object o)`
 * `Try<Throwable>	failed()` - 
 Returns `Success(throwable)` if this is a `Failure(throwable)`, 
 otherwise a `Failure(new NoSuchElementException("Success.failed()"))` 
@@ -135,73 +134,58 @@ Returns `this` if `this` is a `Failure` or `this` is a
          CheckedFunction1<? super T,? extends Throwable> errorProvider)`
 Returns `this` if `this` is a `Failure` or `this` is a `Success` 
 and the value satisfies the predicate.
-default Try<T>	filterTry(CheckedPredicate<? super T> predicate,
-         Supplier<? extends Throwable> throwableSupplier)
-Returns this if this is a Failure or this is a Success and the value satisfies the predicate.
-default <U> Try<U>	flatMap(Function<? super T,? extends Try<? extends U>> mapper)
-Shortcut for flatMapTry(mapper::apply), see flatMapTry(CheckedFunction1).
-default <U> Try<U>	flatMapTry(CheckedFunction1<? super T,? extends Try<? extends U>> mapper)
-FlatMaps the value of a Success or returns a Failure.
-T	get()
-Gets the result of this Try if this is a Success or throws if this is a Failure.
-Throwable	getCause()
-Gets the cause if this is a Failure or throws if this is a Success.
-default T	getOrElseGet(Function<? super Throwable,? extends T> other) 
-default <X extends Throwable>
-T	getOrElseThrow(Function<? super Throwable,X> exceptionProvider) 
-int	hashCode()
-Clarifies that values have a proper hashCode() method implemented.
-default boolean	isAsync()
-A Try's value is computed synchronously.
-boolean	isEmpty()
-Checks whether this Try has no result, i.e.
-boolean	isFailure()
-Checks if this is a Failure.
-default boolean	isLazy()
-A Try's value is computed eagerly.
-default boolean	isSingleValued()
-A Try is a single-valued.
-boolean	isSuccess()
-Checks if this is a Success.
-default Iterator<T>	iterator()
-Returns a rich io.vavr.collection.Iterator.
-default <U> Try<U>	map(Function<? super T,? extends U> mapper)
-Shortcut for mapTry(mapper::apply), see mapTry(CheckedFunction1).
-default Try<T>	mapFailure(API.Match.Case<? extends Throwable,? extends Throwable>... cases)
-Maps the cause to a new exception if this is a Failure or returns this instance if this is a Success.
-default <U> Try<U>	mapTry(CheckedFunction1<? super T,? extends U> mapper)
-Runs the given checked function if this is a Success, passing the result of the current expression to it.
-default Try<T>	onFailure(Consumer<? super Throwable> action)
-Consumes the throwable if this is a Failure.
-default Try<T>	onSuccess(Consumer<? super T> action)
-Consumes the value if this is a Success.
-default Try<T>	orElse(Supplier<? extends Try<? extends T>> supplier) 
-default Try<T>	orElse(Try<? extends T> other) 
-default void	orElseRun(Consumer<? super Throwable> action) 
-default Try<T>	peek(Consumer<? super T> action)
-Applies the action to the value of a Success or does nothing in the case of a Failure.
-default <X extends Throwable>
+* `Try<T>	filterTry(CheckedPredicate<? super T> predicate,
+         Supplier<? extends Throwable> throwableSupplier)`
+* `Try<U>	flatMap(Function<? super T,? extends Try<? extends U>> mapper)`
+* `Try<U>	flatMapTry(CheckedFunction1<? super T,? extends Try<? extends U>> mapper)`
+* `T	get()` - 
+Gets the result of this `Try` if this is a `Success` or throws 
+if this is a `Failure`.
+    * If this is a `Failure`, the underlying cause of type 
+    `Throwable` is thrown.
+* `Throwable	getCause()` - 
+Gets the cause if this is a `Failure` or throws 
+`UnsupportedOperationException` if this is a `Success`.
+`T	getOrElseGet(Function<? super Throwable,? extends T> other)` 
+`<X extends Throwable>
+T	getOrElseThrow(Function<? super Throwable,X> exceptionProvider) `
+* `int	hashCode()`
+* `boolean	isEmpty()` - 
+true if this is a Failure, returns false if this is a Success.
+* `boolean	isFailure()`
+* `boolean	isSuccess()`
+* `Try<U>	map(Function<? super T,? extends U> mapper)`
+* `Try<T>	mapFailure(API.Match.Case<? extends Throwable,? extends Throwable>... cases)` - 
+Maps the cause to a new exception if this is a `Failure` 
+or returns this instance if this is a `Success`.
+`Try<U>	mapTry(CheckedFunction1<? super T,? extends U> mapper)` - 
+Runs the given checked function if this is a `Success`, 
+passing the result of the current expression to it.
+* `Try<T>	onFailure(Consumer<? super Throwable> action)` - 
+Consumes the throwable if this is a `Failure`.
+* `Try<T>	onSuccess(Consumer<? super T> action)` - 
+Consumes the value if this is a `Success`.
+* `Try<T>	orElse(Supplier<? extends Try<? extends T>> supplier)` 
+* `Try<T>	orElse(Try<? extends T> other) `
+* `void	orElseRun(Consumer<? super Throwable> action)` 
+* `Try<T>	peek(Consumer<? super T> action)` - 
+Applies the action to the value of a `Success` or does 
+nothing in the case of a `Failure`.
+* `<X extends Throwable> Try<T>	recover(Class<X> exception,
+       Function<? super X,? extends T> f)` - 
+Returns `this`, if `this` is a `Success` or `this` is a 
+`Failure` and the cause is not assignable from `cause.getClass()`.
+* `<X extends Throwable>
 Try<T>	recover(Class<X> exception,
-       Function<? super X,? extends T> f)
-Returns this, if this is a Success or this is a Failure and the cause is not assignable from cause.getClass().
-default <X extends Throwable>
-Try<T>	recover(Class<X> exception,
-       T value)
-Returns this, if this is a Success or this is a Failure and the cause is not assignable from cause.getClass().
-default Try<T>	recover(Function<? super Throwable,? extends T> f)
-Returns this, if this is a Success, otherwise tries to recover the exception of the failure with f, i.e.
-default <X extends Throwable>
+       T value)`
+* `Try<T>	recover(Function<? super Throwable,? extends T> f)`
+* `<X extends Throwable>
 Try<T>	recoverWith(Class<X> exception,
-           Function<? super X,Try<? extends T>> f)
+           Function<? super X,Try<? extends T>> f)` - 
 Returns this, if this is a Success or this is a Failure and the cause is not assignable from cause.getClass().
-default <X extends Throwable>
+* `<X extends Throwable>
 Try<T>	recoverWith(Class<X> exception,
-           Try<? extends T> recovered) 
-default Try<T>	recoverWith(Function<? super Throwable,? extends Try<? extends T>> f)
-Returns this, if this is a Success, otherwise tries to recover the exception of the failure with f, i.e.
-default Either<Throwable,T>	toEither()
-Converts this Try to an Either.
-String	toString()
-Clarifies that values have a proper toString() method implemented.
-default <U> U	transform(Function<? super Try<T>,? extends U> f)
-Transforms this Try.
+           Try<? extends T> recovered) `
+`Try<T>	recoverWith(Function<? super Throwable,? extends Try<? extends T>> f)`
+* `Either<Throwable,T>	toEither()`
+* `U	transform(Function<? super Try<T>,? extends U> f)`
