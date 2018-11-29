@@ -7,6 +7,7 @@ import java.util.function.Function;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by mtumilowicz on 2018-11-28.
@@ -34,6 +35,16 @@ public class TryInstanceMethodsTest {
     }
 
     @Test
+    public void andFinally_exception() {
+        Try<Integer> vavrTry = Try.of(() -> 1).andFinally(() -> {
+            throw new RuntimeException();
+        });
+
+        assertTrue(vavrTry.isFailure());
+        assertTrue(vavrTry.getCause() instanceof RuntimeException);
+    }
+
+    @Test
     public void andThen_success() {
         var invoked = new AtomicBoolean();
 
@@ -51,6 +62,28 @@ public class TryInstanceMethodsTest {
         }).andThen(() -> invoked.set(true));
 
         assertFalse(invoked.get());
+    }
+
+    @Test
+    public void andThen_success_exception() {
+        Try<Integer> vavrTry = Try.of(() -> 1).andThen(() -> {
+            throw new RuntimeException();
+        });
+
+        assertTrue(vavrTry.isFailure());
+        assertTrue(vavrTry.getCause() instanceof RuntimeException);
+    }
+
+    @Test
+    public void andThen_failure_exception() {
+        Try<Integer> vavrTry = Try.<Integer>of(() -> {
+            throw new IllegalArgumentException();
+        }).andThen(() -> {
+                    throw new RuntimeException();
+                });
+
+        assertTrue(vavrTry.isFailure());
+        assertTrue(vavrTry.getCause() instanceof IllegalArgumentException);
     }
 
     @Test
@@ -164,18 +197,18 @@ public class TryInstanceMethodsTest {
 
         assertThat(recovered, is(Try.of(() -> -1)));
     }
-    
+
     @Test
     public void filterTry_success_predicate_passes_function() {
         Try<Integer> vavrTry = Try.of(() -> 1).filterTry(x -> x > 0, value -> new RuntimeException());
-        
+
         assertThat(vavrTry, is(Try.of(() -> 1)));
     }
 
     @Test
     public void filterTry_success_predicate_notPasses_function() {
         var runtimeException = new RuntimeException();
-        
+
         Try<Integer> vavrTry = Try.of(() -> 1).filterTry(x -> x > 10, value -> runtimeException);
 
         assertThat(vavrTry.getCause(), is(runtimeException));
@@ -185,7 +218,9 @@ public class TryInstanceMethodsTest {
     public void filterTry_failure_predicate_function() {
         var illegalArgumentException = new IllegalArgumentException();
 
-        Try<Integer> vavrTry = Try.<Integer>of(() -> {throw illegalArgumentException;})
+        Try<Integer> vavrTry = Try.<Integer>of(() -> {
+            throw illegalArgumentException;
+        })
                 .filterTry(x -> x > 0, value -> new RuntimeException());
 
         assertThat(vavrTry.getCause(), is(illegalArgumentException));
@@ -196,7 +231,9 @@ public class TryInstanceMethodsTest {
         var nullPointerException = new NullPointerException();
 
         Try<Integer> vavrTry = Try.of(() -> 1)
-                .filterTry(x -> {throw nullPointerException;}, value -> new RuntimeException());
+                .filterTry(x -> {
+                    throw nullPointerException;
+                }, value -> new RuntimeException());
 
         assertThat(vavrTry.getCause(), is(nullPointerException));
     }
@@ -205,8 +242,12 @@ public class TryInstanceMethodsTest {
     public void filterTry_failure_predicate_exception_function() {
         var illegalArgumentException = new IllegalArgumentException();
 
-        Try<Integer> vavrTry = Try.<Integer>of(() -> {throw illegalArgumentException;})
-                .filterTry(x -> {throw new NullPointerException();}, value -> new RuntimeException());
+        Try<Integer> vavrTry = Try.<Integer>of(() -> {
+            throw illegalArgumentException;
+        })
+                .filterTry(x -> {
+                    throw new NullPointerException();
+                }, value -> new RuntimeException());
 
         assertThat(vavrTry.getCause(), is(illegalArgumentException));
     }
