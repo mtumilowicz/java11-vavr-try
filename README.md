@@ -13,6 +13,19 @@ that may either result in an exception, or return a successfully
 computed value. Instances of `Try`, are either an instance of 
 `Success` or `Failure`.
 
+Easy example - parsing `Integer` from `String` (`PrefaceExampleTest`)
+```
+Try<Integer> parseInteger = Try.of(() -> Integer.valueOf("a"));
+
+assertTrue(parseInteger.isFailure());
+```
+```
+Try<Integer> parseInteger = Try.of(() -> Integer.valueOf("1"));
+
+assertTrue(parseInteger.isSuccess());
+assertThat(parseInteger.get(), is(1));
+```
+
 # project description
 We provide description and tests for `Try`'s methods.
 
